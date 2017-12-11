@@ -1,8 +1,18 @@
 #include <iostream>
 #include <list>
 #include <stack>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctime>
 
 using namespace std;
+
+#define MIN_PER_RANK 1 /* Nodes/Rank: How 'fat' the DAG should be.  */
+#define MAX_PER_RANK 5
+#define MIN_RANKS 3    /* Ranks: How 'tall' the DAG should be.  */
+#define MAX_RANKS 5
+#define PERCENT 70     /* Chance of having an Edge.  */
+
 
 // Class to represent a graph
 class Graph {
@@ -22,6 +32,36 @@ public:
 
     // prints a Topological Sort of the complete graph
     void topologicalSort();
+
+    void generator (int inputedNodes)
+    {
+        int i, j, k, nodes = inputedNodes;
+
+        int ranks = MIN_RANKS
+                    + (rand () % (MAX_RANKS - MIN_RANKS + 1));
+
+        printf ("digraph {\n");
+//        for (i = 0; i < ranks; i++)
+//        {
+            /* New nodes of 'higher' rank than all nodes generated till now.  */
+//            int new_nodes = rand()%nodes;
+//                    MIN_PER_RANK
+//                            + (rand () % (MAX_PER_RANK - MIN_PER_RANK + 1));
+
+            /* Edges from old nodes ('nodes') to new ones ('new_nodes').  */
+            for (j = 0; j < nodes; j++)
+                for (k = j + 1; k < nodes; k++)
+                    if ( (rand () % 100) < PERCENT) {
+                        cout << j << "->" << k << endl;
+                        addEdge(j, k); /* An Edge.  */
+                    }
+//            cout << "OK3" << endl;
+////            nodes += new_nodes; /* Accumulate into old node set.  */
+//            cout << "OK4" << endl;
+//        }
+        printf ("}\n");
+    }
+
 };
 
 Graph::Graph(int V) {
@@ -77,12 +117,13 @@ void Graph::topologicalSort() {
     }
     int i = 0;
     while (!Stack.empty()) {
-        cout << i << " " << endl;
-//        visited[Stack.top()]
+        cout << Stack.top() << " ";
+//
         i++;
 //        cout << Stack.top() << " ";
         Stack.pop();
     }
+    cout << endl;
 }
 
 //bool topological_sort() {
@@ -111,13 +152,15 @@ void Graph::topologicalSort() {
 
 // Driver program to test above functions
 int main() {
+    srand((unsigned int) time(nullptr));
     // Create a graph given in the above diagram
     Graph g(4);
-    g.addEdge(0, 1);
-    g.addEdge(2, 1);
-    g.addEdge(0, 3);
-    g.addEdge(3, 2);
-    g.addEdge(0, 2);
+    g.generator(4);
+//    g.addEdge(0, 1);
+//    g.addEdge(0, 2);
+//    g.addEdge(3, 1);
+//    g.addEdge(3, 2);
+//    g.addEdge(0, 2);
 //    g.addEdge(2, 1);
 
     cout << "Following is a Topological Sort of the given graph \n" << endl;
