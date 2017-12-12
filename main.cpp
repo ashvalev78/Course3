@@ -32,6 +32,7 @@ public:
     void addEdge(int v, int w);
     bool topologicalSort();
     void generator();
+    void renum(int num);
     //деструктор
 };
 
@@ -73,18 +74,21 @@ bool Graph::topologicalSortUtil(int v, int color[], stack<int> &Stack) {
         cout << "Cycle detected => ";
         return false;
     }
-    cout << "OK" << endl;
+//    cout << "OK" << endl;
     color[v] = GREY;
-    cout << "OK2" << endl;
-    int j = v;
-    for (auto i = nodeArray[v].siblings.begin(); i != nodeArray[v].siblings.end(); ++i, ++j)
-        if (color[j] != BLACK) {
-            if (!topologicalSortUtil(nodeArray[v].siblings[j]->num, color, Stack)) return false;
+//    cout << "OK2" << endl;
+    for (auto i = nodeArray[v].siblings.begin(); i != nodeArray[v].siblings.end(); ++i)
+        if (color[(*i)->num] != BLACK) {
+            if (!topologicalSortUtil((*i)->num, color, Stack)) return false;
         }
 
     color[v] = BLACK;
     Stack.push(v);
     return true;
+}
+
+void Graph::renum(int num) {
+    
 }
 
 bool Graph::topologicalSort() {
@@ -98,7 +102,7 @@ bool Graph::topologicalSort() {
         if (color[i] == WHITE)
             if (!topologicalSortUtil(i, color, Stack)) {
                 cout << "Topological sort of the given graph is impossible";
-                while(!Stack.empty()) Stack.pop();
+                while (!Stack.empty()) Stack.pop();
                 return false;
             }
     }
@@ -125,7 +129,7 @@ void Graph :: generator ()
 int main() {
     srand(time(nullptr));
     // Create a graph given in the above diagram
-    Graph g(5);
+    Graph g(15);
     g.generator();
     g.topologicalSort();
 
