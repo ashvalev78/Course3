@@ -39,6 +39,13 @@ public:
         }
         cout << endl;
     };
+
+    void fileOutput() {
+        for (int i = 0; i < V; i++) {
+            for (auto j = nodeArray[i].siblings.begin(); j < nodeArray[i].siblings.end(); j++)
+                cout << nodeArray[i].num << "->" << (*j)->num << endl;
+        }
+    };
     //деструктор
 };
 
@@ -152,6 +159,7 @@ int main() {
 //    g.generator();
     g.topologicalSort();
     g.output();
+    g.fileOutput();
 
 //    Graph n(g);
 //    n.topologicalSort();
