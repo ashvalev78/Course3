@@ -9,14 +9,14 @@
 C:/Users/mi/CLionProjects/Course3/main.cpp
 iostream
 -
+fstream
+-
 list
 -
 stack
 -
-stdio.h
--
-stdlib.h
--
 ctime
+-
+vector
 -
 
