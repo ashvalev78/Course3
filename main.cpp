@@ -32,7 +32,13 @@ public:
     void addEdge(int v, int w);
     bool topologicalSort();
     void generator();
-    void renum(int num);
+    void renum(int num, int change);
+    void output() {
+        for (int i = 0; i < V; i++) {
+            cout << nodeArray[i].num << " ";
+        }
+        cout << endl;
+    };
     //деструктор
 };
 
@@ -55,6 +61,7 @@ Graph::Graph(int V) {
 void Graph::addEdge(int v, int w) {
     cout << v << "->" << w << endl;
     nodeArray[v].siblings.push_back(&nodeArray[w]);
+    cout << "OK" << endl;
 //    for (auto i = nodeArray[v].siblings.begin(); i < nodeArray[v].siblings.end(); i++)
 //        cout << (*i)->num;
 //
@@ -87,8 +94,8 @@ bool Graph::topologicalSortUtil(int v, int color[], stack<int> &Stack) {
     return true;
 }
 
-void Graph::renum(int num) {
-    
+void Graph::renum(int num, int change) {
+    nodeArray[num].num = change;
 }
 
 bool Graph::topologicalSort() {
@@ -108,11 +115,14 @@ bool Graph::topologicalSort() {
     }
 
     cout << "\nFollowing is a Topological Sort of the given graph:\n";
-
+    int change = 0;
     while (!Stack.empty()) {
         cout << Stack.top() << " ";
+        renum(Stack.top(), change);
+        change++;
         Stack.pop();
     }
+    cout << endl;
     return true;
 }
 
@@ -129,9 +139,19 @@ void Graph :: generator ()
 int main() {
     srand(time(nullptr));
     // Create a graph given in the above diagram
-    Graph g(15);
-    g.generator();
+    Graph g(8);
+    g.addEdge(0,1);
+    g.addEdge(0,4);
+    g.addEdge(1,2);
+    g.addEdge(1,5);
+    g.addEdge(1,7);
+    g.addEdge(3,1);
+    g.addEdge(4,5);
+    g.addEdge(6,4);
+    g.addEdge(6,7);
+//    g.generator();
     g.topologicalSort();
+    g.output();
 
 //    Graph n(g);
 //    n.topologicalSort();
