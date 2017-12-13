@@ -11,8 +11,6 @@ iostream
 -
 fstream
 -
-list
--
 stack
 -
 ctime

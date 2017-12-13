@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
-#include <ctime>
 #include <vector>
+#include <ctime>
 
 using namespace std;
 
@@ -26,20 +26,30 @@ class Graph {
     bool topologicalSortUtil(int v, int color[], stack<int> &Stack);
 
 public:
+    Graph() { V = 0; nodeArray = nullptr; };
     Graph(int V);
+    void setVertices(int num);
     void addEdge(int v, int w);
     bool topologicalSort();
     void generator();
     void renum(int num, int change);
-    void output();
+    void output(const string str);
     void fileOutput();
     void userInput();
+    void reuse() {
+        node *tmp = nodeArray;
+        nodeArray = nullptr;
+        delete [] tmp;
+    }
     ~Graph() {
         delete [] nodeArray;
     };
 };
 
 Graph::Graph(int V) {
+    setVertices(V);
+}
+void Graph::setVertices(int V) {
     this->V = V;
     nodeArray = new node[V];
     for (int i = 0; i < V; i++) {
@@ -51,8 +61,6 @@ Graph::Graph(int V) {
 
     fout << "digraph {\n}";
     fout.close();
-    //очистить файл .dot
-    //добавить инициализацию графа в файл .dot
 }
 
 void Graph::addEdge(int v, int w) {
@@ -73,7 +81,8 @@ bool Graph::topologicalSortUtil(int v, int color[], stack<int> &Stack) {
         return false;
     }
     color[v] = GREY;
-    for (auto i = nodeArray[v].siblings.begin(); i != nodeArray[v].siblings.end(); ++i)
+    vector <node*> :: iterator i;
+    for (i = nodeArray[v].siblings.begin(); i != nodeArray[v].siblings.end(); ++i)
         if (color[(*i)->num] != BLACK) {
             if (!topologicalSortUtil((*i)->num, color, Stack)) return false;
         }
@@ -90,34 +99,31 @@ void Graph::renum(int num, int change) {
 bool Graph::topologicalSort() {
     stack<int> Stack;
 
-    auto *color = new int[V];
+    int *color = new int[V];
     for (int i = 0; i < V; i++)
         color[i] = WHITE;
 
     for (int i = 0; i < V; i++) {
         if (color[i] == WHITE)
             if (!topologicalSortUtil(i, color, Stack)) {
-                cout << "Topological sort of the given graph is impossible";
+                cout << "Topological sort of the given graph is impossible\n";
                 while (!Stack.empty()) Stack.pop();
                 return false;
             }
     }
 
-    cout << "\nFollowing is a Topological Sort of the given graph:\n";
     int change = 0;
     while (!Stack.empty()) {
-        cout << Stack.top() << " ";
         renum(Stack.top(), change);
         change++;
         Stack.pop();
     }
-    cout << endl;
     return true;
 }
 
 void Graph :: generator ()
 {
-    const int PERCENT = 40;
+    const int PERCENT = 70;
     for (int j = 0; j < V; j++)
         for (int k = j + 1; k < V; k++)
             if ( (rand () % 100) < PERCENT) {
@@ -125,9 +131,13 @@ void Graph :: generator ()
             }
 }
 
-void Graph::output() {
+void Graph::output(const string str) {
+    cout << str << endl;
     for (int i = 0; i < V; i++) {
-        cout << nodeArray[i].num << " ";
+        vector <node*> :: iterator j;
+        for (j = nodeArray[i].siblings.begin(); j < nodeArray[i].siblings.end(); j++) {
+            cout << nodeArray[i].num << " -> " << (*j)->num << endl;
+        }
     }
     cout << endl;
 };
@@ -136,12 +146,10 @@ void Graph::fileOutput() {
     ofstream fout;
     fout.open(SNDPATH);
     if (!fout.is_open()) cout << "Cannot open the file\n";
-
     fout << "digraph {\n";
     for (int i = 0; i < V; i++) {
         for (auto j = nodeArray[i].siblings.begin(); j < nodeArray[i].siblings.end(); j++) {
-            cout << nodeArray[i].num << "->" << (*j)->num << endl;
-            fout << "\t" << nodeArray[i].num << "->" << (*j)->num << endl;
+            fout << "\t" << nodeArray[i].num << " -> " << (*j)->num << ";" << endl;
         }
     }
     fout << "}";
@@ -149,6 +157,7 @@ void Graph::fileOutput() {
 };
 
 void Graph::userInput() {
+
     cout << "To end your input enter -1 into any of nodes" << endl;
     int node1, node2;
     cout << "Enter the nodes you want to connect" << endl;
@@ -163,78 +172,89 @@ void Graph::userInput() {
 }
 
 void Menu() {
-    cout << "--------------------------------------------------------------" << endl;
-    cout << "If you want to generate graph automatically, press 1" << endl;
-    cout << "If you want to input your own graph, press 2" << endl;
-//    cout << "If you want to sort the graph, press 3" << endl;
-    cout << "If you want to check the time complexity, press 3" << endl;
-    cout << "If you want to see menu again, press 4" << endl;
-    cout << "If you want to exit, press q" << endl;
-    cout << "--------------------------------------------------------------" << endl;
+    cout << "Press (1) to set vertices of the graph" << endl;
+    cout << "Press (2) to generate edges" << endl;
+    cout << "Press (3) to set edges by yourself" << endl;
+    cout << "Press (4) to toposort graph" << endl;
+    cout << "Press (5) to test the time of the program" << endl;
+    cout << "Press (6) to delete old graph" << endl;
+    cout << "Press (0) to finish the program" << endl;
 }
 
 int main() {
     srand(time(nullptr));
-    char ch = 0;
     Menu();
-    while (ch != 'q') {
-        cin >> ch;
-        switch (ch) {
+    Graph g;
+    int V;
+    char input = 1;
+    bool verticesSet = false, edgesSet = false;
+    while (input != '0') {
+        cout << "Press any key to continue . . ." << endl;
+        cin >> input;
+        switch (input) {
             case '1': {
-                cout << "You have chosen to generate the graph" << endl;
-                cout << "Enter the size of the graph" << endl;
-                int size;
-                cin >> size;
-                cout << "Your size is " << size << endl;
-                Graph g(size);
-                g.generator();
-                cout << "Do you want to sort this graph? y/n" << endl;
-                char answer;
-                cin >> answer;
-                if (answer == 'y') {
-                    g.topologicalSort();
-                } else {
-                    cout << "OK, leaving this paragraph" << endl;
-                }
-                cout << "--------------------------------------------------------------" << endl;
-            } break;
+                cout << "Pressed 1. Enter the number of vertices in the graph" << endl;
+                cin >> V;
+                if (V <= 0) break;
+                g.setVertices(V);
+                verticesSet = true;
+                break;
+            }
             case '2': {
-                cout << "You have chosen to enter the graph" << endl;
-                cout << "Enter the size of the graph" << endl;
-                int size;
-                cin >> size;
-                cout << "Your size is " << size << endl;
-                Graph g(size);
+                if (!verticesSet || edgesSet) {
+                    cout << "Graph cannot be generated" << endl;
+                    break;
+                }
+                cout << "Pressed 2. The graph will be generated" << endl;
+                g.generator();
+                g.output("Generated graph");
+                edgesSet = true;
+                break;
+            }
+            case '3': {
+                if (!verticesSet || edgesSet) {
+                    cout << "Graph cannot be generated" << endl;
+                    break;
+                }
+                cout << "Pressed 3. The graph will be entered by user" << endl;
                 g.userInput();
-                cout << "Do you want to sort this graph? y/n" << endl;
-                char answer;
-                cin >> answer;
-                if (answer == 'y') {
-                    g.topologicalSort();
-                } else {
-                    cout << "OK, leaving this paragraph" << endl;
+                g.output("Entered graph");
+                edgesSet = true;
+                break;
+            }
+            case '4': {
+                if (!edgesSet) {
+                    cout << "Graph cannot be sorted" << endl;
+                    break;
                 }
-                cout << "--------------------------------------------------------------" << endl;
-            } break;
-            case '3':
-                for (int i = 0; i < 1000; i++) {
-                    Graph g(10);
-                    g.generator();
-                    g.topologicalSort();
+                cout << "Pressed 4. The graph will be sorted" << endl;
+                if (g.topologicalSort()) {
+                    g.output("Sorted graph");
+                    g.fileOutput();
                 }
                 break;
-            case '4': Menu();
+            }
+            case '5': {
+                const int q0 = 1000;
+                const int v = 10;
+                clock_t begin = clock();
+                for (int i = 0; i < q0; i++) {
+                    Graph e(v);
+                    e.generator();
+                    e.topologicalSort();
+                }
+                clock_t end = clock() - begin;
+                cout << "Time = " << end << endl;
                 break;
-            default: {
-                cout << "You have chosen the wrong option, please try again";
-            } break;
+            }
+            case '6': {
+                g.reuse();
+                verticesSet = false, edgesSet = false;
+                break;
+            }
+            default:
+                break;
         }
     }
-    Graph g(8);
-    g.generator();
-    g.topologicalSort();
-    g.output();
-    g.fileOutput();
-
     return 0;
 }
