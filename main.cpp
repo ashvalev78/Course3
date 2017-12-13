@@ -33,6 +33,7 @@ public:
     void renum(int num, int change);
     void output();
     void fileOutput();
+    void userInput();
     ~Graph() {
         delete [] nodeArray;
     };
@@ -147,8 +148,88 @@ void Graph::fileOutput() {
     fout.close();
 };
 
+void Graph::userInput() {
+    cout << "To end your input enter -1 into any of nodes" << endl;
+    int node1, node2;
+    cout << "Enter the nodes you want to connect" << endl;
+    cin >> node1 >> node2;
+    cout << node1 << "->" << node2 << endl;
+    while (node1 >= 0 && node2 >=0 && node1 <= V && node2 <= V) {
+        addEdge(node1, node2);
+        cout << "Enter the nodes you want to connect" << endl;
+        cin >> node1 >> node2;
+        cout << node1 << "->" << node2 << endl;
+    }
+}
+
+void Menu() {
+    cout << "--------------------------------------------------------------" << endl;
+    cout << "If you want to generate graph automatically, press 1" << endl;
+    cout << "If you want to input your own graph, press 2" << endl;
+//    cout << "If you want to sort the graph, press 3" << endl;
+    cout << "If you want to check the time complexity, press 3" << endl;
+    cout << "If you want to see menu again, press 4" << endl;
+    cout << "If you want to exit, press q" << endl;
+    cout << "--------------------------------------------------------------" << endl;
+}
+
 int main() {
     srand(time(nullptr));
+    char ch = 0;
+    Menu();
+    while (ch != 'q') {
+        cin >> ch;
+        switch (ch) {
+            case '1': {
+                cout << "You have chosen to generate the graph" << endl;
+                cout << "Enter the size of the graph" << endl;
+                int size;
+                cin >> size;
+                cout << "Your size is " << size << endl;
+                Graph g(size);
+                g.generator();
+                cout << "Do you want to sort this graph? y/n" << endl;
+                char answer;
+                cin >> answer;
+                if (answer == 'y') {
+                    g.topologicalSort();
+                } else {
+                    cout << "OK, leaving this paragraph" << endl;
+                }
+                cout << "--------------------------------------------------------------" << endl;
+            } break;
+            case '2': {
+                cout << "You have chosen to enter the graph" << endl;
+                cout << "Enter the size of the graph" << endl;
+                int size;
+                cin >> size;
+                cout << "Your size is " << size << endl;
+                Graph g(size);
+                g.userInput();
+                cout << "Do you want to sort this graph? y/n" << endl;
+                char answer;
+                cin >> answer;
+                if (answer == 'y') {
+                    g.topologicalSort();
+                } else {
+                    cout << "OK, leaving this paragraph" << endl;
+                }
+                cout << "--------------------------------------------------------------" << endl;
+            } break;
+            case '3':
+                for (int i = 0; i < 1000; i++) {
+                    Graph g(10);
+                    g.generator();
+                    g.topologicalSort();
+                }
+                break;
+            case '4': Menu();
+                break;
+            default: {
+                cout << "You have chosen the wrong option, please try again";
+            } break;
+        }
+    }
     Graph g(8);
     g.generator();
     g.topologicalSort();
